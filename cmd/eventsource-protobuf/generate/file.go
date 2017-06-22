@@ -22,13 +22,13 @@ type serializer struct {
 }
 
 func (s *serializer) MarshalEvent(event eventsource.Event) (eventsource.Record, error) {
-	container := &{{ .Message.Name | base }}{};
+	container := &{{ .Message.Name | base | camel }}{}
 
 	switch v := event.(type) {
 {{ range .Fields }}
-	case *{{ .TypeName | base }}:
+	case *{{ .TypeName | base | camel }}:
 		container.Type = {{ .Number }}
-		container.{{ .Name | capitalize }} = v
+		container.{{ .Name | camel }} = v
 {{ end }}
 	default:
 		return eventsource.Record{}, fmt.Errorf("Unhandled type, %v", event)
@@ -46,7 +46,7 @@ func (s *serializer) MarshalEvent(event eventsource.Event) (eventsource.Record, 
 }
 
 func (s *serializer) UnmarshalEvent(record eventsource.Record) (eventsource.Event, error) {
-	container := &{{ .Message.Name | base }}{};
+	container := &{{ .Message.Name | base | camel }}{};
 	err := proto.Unmarshal(record.Data, container)
 	if err != nil {
 		return nil, err
@@ -56,7 +56,7 @@ func (s *serializer) UnmarshalEvent(record eventsource.Record) (eventsource.Even
 	switch container.Type {
 {{ range .Fields }}
 	case {{ .Number }}:
-		event = container.{{ .Name | capitalize }}
+		event = container.{{ .Name | camel }}
 {{ end }}
 	default:
 		return nil, fmt.Errorf("Unhandled type, %v", container.Type)
@@ -69,9 +69,9 @@ func NewSerializer() eventsource.Serializer {
 	return &serializer{}
 }
 {{ range .Fields }}
-func (e *{{ .TypeName | base }}) AggregateID() string { return e.Id }
-func (e *{{ .TypeName | base }}) EventVersion() int   { return int(e.Version) }
-func (e *{{ .TypeName | base }}) EventAt() time.Time  { return time.Unix(e.At, 0) }
+func (m *{{ .TypeName | base | camel }}) AggregateID() string { return m.Id }
+func (m *{{ .TypeName | base | camel }}) EventVersion() int   { return int(m.Version) }
+func (m *{{ .TypeName | base | camel }}) EventAt() time.Time  { return time.Unix(m.At, 0) }
 {{ end }}
 `
 )

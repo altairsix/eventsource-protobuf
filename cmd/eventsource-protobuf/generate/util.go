@@ -55,18 +55,24 @@ func lower(in string) string {
 	return strings.ToLower(in)
 }
 
-func capitalize(in string) string {
-	if in == "" {
-		return ""
+func camel(in string) string {
+	segments := strings.Split(in, "_")
+	capped := make([]string, 0, len(segments))
+
+	for _, segment:= range segments{
+		if segment == "" {
+			continue
+		}
+		capped = append(capped, strings.ToUpper(segment[0:1]) + segment[1:])
 	}
-	return strings.ToUpper(in[0:1]) + in[1:]
+	return strings.Join(capped, "")
 }
 
 func newTemplate(content string) (*template.Template, error) {
 	fn := map[string]interface{}{
-		"base":       base,
-		"lower":      lower,
-		"capitalize": capitalize,
+		"base":  base,
+		"lower": lower,
+		"camel": camel,
 	}
 
 	return template.New("page").Funcs(fn).Parse(content)

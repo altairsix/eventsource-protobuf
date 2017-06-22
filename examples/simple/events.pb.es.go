@@ -12,17 +12,17 @@ type serializer struct {
 }
 
 func (s *serializer) MarshalEvent(event eventsource.Event) (eventsource.Record, error) {
-	container := &Events{};
+	container := &EventContainer{}
 
 	switch v := event.(type) {
 
 	case *A:
 		container.Type = 2
-		container.A = v
+		container.Ma = v
 
 	case *B:
 		container.Type = 3
-		container.B = v
+		container.Mb = v
 
 	default:
 		return eventsource.Record{}, fmt.Errorf("Unhandled type, %v", event)
@@ -40,7 +40,7 @@ func (s *serializer) MarshalEvent(event eventsource.Event) (eventsource.Record, 
 }
 
 func (s *serializer) UnmarshalEvent(record eventsource.Record) (eventsource.Event, error) {
-	container := &Events{};
+	container := &EventContainer{};
 	err := proto.Unmarshal(record.Data, container)
 	if err != nil {
 		return nil, err
@@ -50,10 +50,10 @@ func (s *serializer) UnmarshalEvent(record eventsource.Record) (eventsource.Even
 	switch container.Type {
 
 	case 2:
-		event = container.A
+		event = container.Ma
 
 	case 3:
-		event = container.B
+		event = container.Mb
 
 	default:
 		return nil, fmt.Errorf("Unhandled type, %v", container.Type)
@@ -66,11 +66,11 @@ func NewSerializer() eventsource.Serializer {
 	return &serializer{}
 }
 
-func (e *A) AggregateID() string { return e.Id }
-func (e *A) EventVersion() int   { return int(e.Version) }
-func (e *A) EventAt() time.Time  { return time.Unix(e.At, 0) }
+func (m *A) AggregateID() string { return m.Id }
+func (m *A) EventVersion() int   { return int(m.Version) }
+func (m *A) EventAt() time.Time  { return time.Unix(m.At, 0) }
 
-func (e *B) AggregateID() string { return e.Id }
-func (e *B) EventVersion() int   { return int(e.Version) }
-func (e *B) EventAt() time.Time  { return time.Unix(e.At, 0) }
+func (m *B) AggregateID() string { return m.Id }
+func (m *B) EventVersion() int   { return int(m.Version) }
+func (m *B) EventAt() time.Time  { return time.Unix(m.At, 0) }
 
