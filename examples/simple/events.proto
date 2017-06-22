@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package main;
+
+message A {
+    string id = 1;
+    int32 version = 2;
+    int64 at = 3;
+}
+
+message B {
+    string id = 1;
+    int32 version = 2;
+    int64 at = 3;
+}
+
+message Events {
+    int32 type = 1;
+    A a = 2;
+    B b = 3;
+}

@@ -1,3 +1,10 @@
+# ignore intellij files
+#
+.idea
+*.iml
+*.ipr
+*.iws
+
 # Binaries for programs and plugins
 *.exe
 *.dll
@@ -12,3 +19,7 @@
 
 # Project-local glide cache, RE: https://github.com/Masterminds/glide/issues/736
 .glide/
+
+# ignore generated files
+#
+/cmd/eventsource-protobuf/eventsource-protobuf
