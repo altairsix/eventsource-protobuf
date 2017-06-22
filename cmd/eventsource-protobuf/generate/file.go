@@ -25,19 +25,7 @@ type serializer struct {
 }
 
 func (s *serializer) MarshalEvent(event eventsource.Event) (eventsource.Record, error) {
-	container := &{{ .Message.Name | base | camel }}{}
-
-	switch v := event.(type) {
-{{ range .Fields }}
-	case *{{ .TypeName | base | camel }}:
-		container.Type = {{ .Number }}
-		container.{{ .Name | camel }} = v
-{{ end }}
-	default:
-		return eventsource.Record{}, fmt.Errorf("Unhandled type, %v", event)
-	}
-
-	data, err := proto.Marshal(container)
+	data, err := MarshalEvent(event)
 	if err != nil {
 		return eventsource.Record{}, err
 	}
@@ -49,8 +37,42 @@ func (s *serializer) MarshalEvent(event eventsource.Event) (eventsource.Record, 
 }
 
 func (s *serializer) UnmarshalEvent(record eventsource.Record) (eventsource.Event, error) {
+	return UnmarshalEvent(record.Data)
+}
+
+func NewSerializer() eventsource.Serializer {
+	return &serializer{}
+}
+{{ range .Fields }}
+func (m *{{ .TypeName | base | camel }}) AggregateID() string { return m.Id }
+func (m *{{ .TypeName | base | camel }}) EventVersion() int   { return int(m.Version) }
+func (m *{{ .TypeName | base | camel }}) EventAt() time.Time  { return time.Unix(m.At, 0) }
+{{ end }}
+
+func MarshalEvent(event eventsource.Event) ([]byte, error) {
+	container := &{{ .Message.Name | base | camel }}{}
+
+	switch v := event.(type) {
+{{ range .Fields }}
+	case *{{ .TypeName | base | camel }}:
+		container.Type = {{ .Number }}
+		container.{{ .Name | camel }} = v
+{{ end }}
+	default:
+		return nil, fmt.Errorf("Unhandled type, %v", event)
+	}
+
+	data, err := proto.Marshal(container)
+	if err != nil {
+		return nil, err
+	}
+
+	return data, nil
+}
+
+func UnmarshalEvent(data []byte) (eventsource.Event, error) {
 	container := &{{ .Message.Name | base | camel }}{};
-	err := proto.Unmarshal(record.Data, container)
+	err := proto.Unmarshal(data, container)
 	if err != nil {
 		return nil, err
 	}
@@ -67,15 +89,6 @@ func (s *serializer) UnmarshalEvent(record eventsource.Record) (eventsource.Even
 
 	return event.(eventsource.Event), nil
 }
-
-func NewSerializer() eventsource.Serializer {
-	return &serializer{}
-}
-{{ range .Fields }}
-func (m *{{ .TypeName | base | camel }}) AggregateID() string { return m.Id }
-func (m *{{ .TypeName | base | camel }}) EventVersion() int   { return int(m.Version) }
-func (m *{{ .TypeName | base | camel }}) EventAt() time.Time  { return time.Unix(m.At, 0) }
-{{ end }}
 `
 )
 

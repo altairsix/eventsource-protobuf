@@ -15,6 +15,35 @@ type serializer struct {
 }
 
 func (s *serializer) MarshalEvent(event eventsource.Event) (eventsource.Record, error) {
+	data, err := MarshalEvent(event)
+	if err != nil {
+		return eventsource.Record{}, err
+	}
+
+	return eventsource.Record{
+		Version: event.EventVersion(),
+		Data:    data,
+	}, nil
+}
+
+func (s *serializer) UnmarshalEvent(record eventsource.Record) (eventsource.Event, error) {
+	return UnmarshalEvent(record.Data)
+}
+
+func NewSerializer() eventsource.Serializer {
+	return &serializer{}
+}
+
+func (m *A) AggregateID() string { return m.Id }
+func (m *A) EventVersion() int   { return int(m.Version) }
+func (m *A) EventAt() time.Time  { return time.Unix(m.At, 0) }
+
+func (m *B) AggregateID() string { return m.Id }
+func (m *B) EventVersion() int   { return int(m.Version) }
+func (m *B) EventAt() time.Time  { return time.Unix(m.At, 0) }
+
+
+func MarshalEvent(event eventsource.Event) ([]byte, error) {
 	container := &EventContainer{}
 
 	switch v := event.(type) {
@@ -28,23 +57,20 @@ func (s *serializer) MarshalEvent(event eventsource.Event) (eventsource.Record, 
 		container.Mb = v
 
 	default:
-		return eventsource.Record{}, fmt.Errorf("Unhandled type, %v", event)
+		return nil, fmt.Errorf("Unhandled type, %v", event)
 	}
 
 	data, err := proto.Marshal(container)
 	if err != nil {
-		return eventsource.Record{}, err
+		return nil, err
 	}
 
-	return eventsource.Record{
-		Version: event.EventVersion(),
-		Data:    data,
-	}, nil
+	return data, nil
 }
 
-func (s *serializer) UnmarshalEvent(record eventsource.Record) (eventsource.Event, error) {
+func UnmarshalEvent(data []byte) (eventsource.Event, error) {
 	container := &EventContainer{};
-	err := proto.Unmarshal(record.Data, container)
+	err := proto.Unmarshal(data, container)
 	if err != nil {
 		return nil, err
 	}
@@ -64,16 +90,3 @@ func (s *serializer) UnmarshalEvent(record eventsource.Record) (eventsource.Even
 
 	return event.(eventsource.Event), nil
 }
-
-func NewSerializer() eventsource.Serializer {
-	return &serializer{}
-}
-
-func (m *A) AggregateID() string { return m.Id }
-func (m *A) EventVersion() int   { return int(m.Version) }
-func (m *A) EventAt() time.Time  { return time.Unix(m.At, 0) }
-
-func (m *B) AggregateID() string { return m.Id }
-func (m *B) EventVersion() int   { return int(m.Version) }
-func (m *B) EventAt() time.Time  { return time.Unix(m.At, 0) }
-
