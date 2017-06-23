@@ -68,11 +68,56 @@ func camel(in string) string {
 	return strings.Join(capped, "")
 }
 
+func typ(in interface{}) interface{} {
+	switch v := in.(type) {
+	case *descriptor.FieldDescriptorProto_Type:
+		switch *v {
+		case descriptor.FieldDescriptorProto_TYPE_BOOL:
+			return "bool"
+		case descriptor.FieldDescriptorProto_TYPE_BYTES:
+			return "[]byte"
+		case descriptor.FieldDescriptorProto_TYPE_DOUBLE:
+			return "float64"
+		case descriptor.FieldDescriptorProto_TYPE_INT32:
+			return "int32"
+		case descriptor.FieldDescriptorProto_TYPE_INT64:
+			return "int64"
+		case descriptor.FieldDescriptorProto_TYPE_STRING:
+			return "string"
+		case descriptor.FieldDescriptorProto_TYPE_UINT32:
+			return "uint32"
+		case descriptor.FieldDescriptorProto_TYPE_UINT64:
+			return "uint64"
+		default:
+			return nil
+		}
+	default:
+		return nil
+	}
+}
+
+func other(fields []*descriptor.FieldDescriptorProto) interface{} {
+	results := make([]*descriptor.FieldDescriptorProto, 0, len(fields))
+
+	if fields != nil {
+		for _, field := range fields {
+			if v := strings.ToLower(*field.Name); v == "id" || v == "version" || v == "at" {
+				continue
+			}
+			results = append(results, field)
+		}
+	}
+
+	return results
+}
+
 func newTemplate(content string) (*template.Template, error) {
 	fn := map[string]interface{}{
 		"base":  base,
 		"lower": lower,
 		"camel": camel,
+		"type":  typ,
+		"other": other,
 	}
 
 	return template.New("page").Funcs(fn).Parse(content)

@@ -23,7 +23,7 @@ func TestEncoderDecoder(t *testing.T) {
 
 	n, err = encoder.WriteEvent(e2)
 	assert.Nil(t, err)
-	assert.Equal(t, 21, n)
+	assert.Equal(t, 23, n)
 
 	// Decode
 

@@ -171,6 +171,37 @@ func NewDecoder(r io.Reader) *Decoder {
 		scratch: bytes.NewBuffer(nil),
 	}
 }
+
+type Builder struct {
+	id      string
+	version int
+	Events  []eventsource.Event
+}
+
+func NewBuilder(id string, version int) *Builder {
+	return &Builder {
+		id:      id,
+		version: version,
+	}
+}
+
+func (b *Builder) nextVersion() int32 {
+	b.version++
+	return int32(b.version)
+}
+
+{{ range .Events }}
+func (b *Builder) {{ .Name | camel }}({{ range .Field | other }}{{ .Name | camel | lower }} {{ .Type | type }}, {{ end }}) {
+	event := &{{ .Name | camel }}{
+		Id:      b.id,
+		Version: b.nextVersion(),
+		At:      time.Now().Unix(),
+{{ range .Field | other }}	{{ .Name | camel }}: {{ .Name | camel | lower }},
+{{ end }}
+	}
+	b.Events = append(b.Events, event)
+}
+{{ end }}
 `
 )
 
@@ -186,6 +217,14 @@ func File(in *descriptor.FileDescriptorProto) (*plugin_go.CodeGeneratorResponse_
 		return nil, err
 	}
 
+	events := make([]*descriptor.DescriptorProto, 0, len(in.MessageType))
+	for _, m := range in.MessageType {
+		if m == message {
+			continue
+		}
+		events = append(events, m)
+	}
+
 	buf := bytes.NewBuffer(nil)
 	t, err := newTemplate(content)
 	if err != nil {
@@ -197,6 +236,7 @@ func File(in *descriptor.FileDescriptorProto) (*plugin_go.CodeGeneratorResponse_
 		"Package": pkg,
 		"Message": message,
 		"Fields":  message.Field[1:],
+		"Events":  events,
 	})
 
 	return &plugin_go.CodeGeneratorResponse_File{
