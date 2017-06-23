@@ -48,7 +48,7 @@ func NewSerializer() eventsource.Serializer {
 	return &serializer{}
 }
 {{ range .Fields }}
-func (m *{{ .TypeName | base | camel }}) AggregateID() string { return m.Id }
+func (m *{{ .TypeName | base | camel }}) AggregateID() string { return m.{{ .TypeName | base | .ID }
 func (m *{{ .TypeName | base | camel }}) EventVersion() int   { return int(m.Version) }
 func (m *{{ .TypeName | base | camel }}) EventAt() time.Time  { return time.Unix(m.At, 0) }
 {{ end }}
@@ -197,6 +197,7 @@ func File(in *descriptor.FileDescriptorProto) (*plugin_go.CodeGeneratorResponse_
 		"Package": pkg,
 		"Message": message,
 		"Fields":  message.Field[1:],
+		"ID":      idFields(in),
 	})
 
 	return &plugin_go.CodeGeneratorResponse_File{

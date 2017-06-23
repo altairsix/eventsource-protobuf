@@ -3,6 +3,7 @@ package generate
 import (
 	"testing"
 
+	"github.com/gogo/protobuf/protoc-gen-gogo/descriptor"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -34,4 +35,20 @@ func TestCamel(t *testing.T) {
 			assert.Equal(t, tc.Expected, camel(tc.In))
 		})
 	}
+}
+
+func TestIDFields(t *testing.T) {
+	results := idFields(&descriptor.FileDescriptorProto{
+		MessageType: []*descriptor.DescriptorProto{
+			{
+				Name: String("Foo"),
+				Field: []*descriptor.FieldDescriptorProto{
+					{
+						Name: String("ID"),
+					},
+				},
+			},
+		},
+	})
+	assert.Equal(t, map[string]string{"Foo": "ID"}, results)
 }

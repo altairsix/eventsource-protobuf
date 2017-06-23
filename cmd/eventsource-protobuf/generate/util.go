@@ -59,11 +59,11 @@ func camel(in string) string {
 	segments := strings.Split(in, "_")
 	capped := make([]string, 0, len(segments))
 
-	for _, segment:= range segments{
+	for _, segment := range segments {
 		if segment == "" {
 			continue
 		}
-		capped = append(capped, strings.ToUpper(segment[0:1]) + segment[1:])
+		capped = append(capped, strings.ToUpper(segment[0:1])+segment[1:])
 	}
 	return strings.Join(capped, "")
 }
@@ -94,4 +94,21 @@ outer:
 	}
 
 	return nil, errors.New("Not found")
+}
+
+// idFields returns a map of Type -> ID field name
+func idFields(in *descriptor.FileDescriptorProto) map[string]string {
+	results := map[string]string{}
+
+outer:
+	for _, mType := range in.MessageType {
+		for _, field := range mType.Field {
+			if strings.ToLower(*field.Name) == "id" {
+				results[*mType.Name] = *field.Name
+				continue outer
+			}
+		}
+	}
+
+	return results
 }
