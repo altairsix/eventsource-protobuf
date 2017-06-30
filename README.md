@@ -14,7 +14,7 @@ The simplest usage is to use eventsource-protobuf is along side your protoc go:g
   
 ```text
 //go:generate protoc --go_out=. events.proto
-//go:generate protoc --plugin=protoc-gen-custom=$GOPATH/bin/eventsource-protobuf --custom_out=. events.proto
+//go:generate protoc --eventsource_out=. events.proto
 ```
 
 ### Limitations

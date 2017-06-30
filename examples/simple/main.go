@@ -6,7 +6,7 @@ import (
 )
 
 //go:generate protoc --go_out=. events.proto
-//go:generate protoc --plugin=protoc-gen-custom=$GOPATH/bin/eventsource-protobuf --custom_out=. events.proto
+//go:generate protoc --eventsource_out=. events.proto
 
 func main() {
 	event := &A{Id: "abc"}

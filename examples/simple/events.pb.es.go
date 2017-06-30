@@ -46,6 +46,7 @@ func (m *B) AggregateID() string { return m.Id }
 func (m *B) EventVersion() int   { return int(m.Version) }
 func (m *B) EventAt() time.Time  { return time.Unix(m.At, 0) }
 
+
 func MarshalEvent(event eventsource.Event) ([]byte, error) {
 	container := &EventContainer{}
 
@@ -72,7 +73,7 @@ func MarshalEvent(event eventsource.Event) ([]byte, error) {
 }
 
 func UnmarshalEvent(data []byte) (eventsource.Event, error) {
-	container := &EventContainer{}
+	container := &EventContainer{};
 	err := proto.Unmarshal(data, container)
 	if err != nil {
 		return nil, err
@@ -94,7 +95,7 @@ func UnmarshalEvent(data []byte) (eventsource.Event, error) {
 	return event.(eventsource.Event), nil
 }
 
-type Encoder struct {
+type Encoder struct{
 	w io.Writer
 }
 
@@ -166,7 +167,7 @@ func (d *Decoder) ReadEvent() (eventsource.Event, error) {
 }
 
 func NewDecoder(r io.Reader) *Decoder {
-	return &Decoder{
+	return &Decoder {
 		r:       bufio.NewReader(r),
 		scratch: bytes.NewBuffer(nil),
 	}
@@ -179,7 +180,7 @@ type Builder struct {
 }
 
 func NewBuilder(id string, version int) *Builder {
-	return &Builder{
+	return &Builder {
 		id:      id,
 		version: version,
 	}
@@ -190,21 +191,25 @@ func (b *Builder) nextVersion() int32 {
 	return int32(b.version)
 }
 
+
 func (b *Builder) A() {
 	event := &A{
 		Id:      b.id,
 		Version: b.nextVersion(),
 		At:      time.Now().Unix(),
+
 	}
 	b.Events = append(b.Events, event)
 }
 
-func (b *Builder) B(name string) {
+func (b *Builder) B(name string, ) {
 	event := &B{
 		Id:      b.id,
 		Version: b.nextVersion(),
 		At:      time.Now().Unix(),
-		Name:    name,
+	Name: name,
+
 	}
 	b.Events = append(b.Events, event)
 }
+
