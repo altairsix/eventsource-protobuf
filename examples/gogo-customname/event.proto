@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+
+package main;
+
+message a {
+    string id = 1 [(gogoproto.customname) = "ID"];
+    int32 version = 2;
+    int64 at = 3;
+}
+
+message b {
+    string id = 1 [(gogoproto.customname) = "ID"];
+    int32 version = 2;
+    int64 at = 3;
+    string name = 4;
+}
+
+message event_container {
+    int32 type = 1;
+    a ma = 2;
+    b mb = 3;
+}

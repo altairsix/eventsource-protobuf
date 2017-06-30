@@ -6,6 +6,7 @@ import (
 	"strings"
 	"text/template"
 
+	"github.com/gogo/protobuf/gogoproto"
 	"github.com/gogo/protobuf/protoc-gen-gogo/descriptor"
 )
 
@@ -111,6 +112,29 @@ func other(fields []*descriptor.FieldDescriptorProto) interface{} {
 	return results
 }
 
+func id(typeName string, messages []*descriptor.DescriptorProto) string {
+	name := base(typeName)
+	for _, message := range messages {
+		if name == *message.Name {
+			for _, field := range message.Field {
+				fieldName := *field.Name
+				if fieldName != "id" {
+					continue
+				}
+
+				name := gogoproto.GetCustomName(field)
+				if name != "" {
+					return name
+				}
+
+				return "Id"
+			}
+		}
+	}
+
+	return "Id"
+}
+
 func newTemplate(content string) (*template.Template, error) {
 	fn := map[string]interface{}{
 		"base":  base,
@@ -118,6 +142,7 @@ func newTemplate(content string) (*template.Template, error) {
 		"camel": camel,
 		"type":  typ,
 		"other": other,
+		"id":    id,
 	}
 
 	return template.New("page").Funcs(fn).Parse(content)
@@ -138,5 +163,5 @@ outer:
 		}
 	}
 
-	return nil, errors.New("Not found")
+	return nil, nil
 }
