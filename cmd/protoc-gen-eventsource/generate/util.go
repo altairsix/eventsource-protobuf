@@ -19,7 +19,7 @@ func String(in string) *string {
 	return &in
 }
 
-func name(in *descriptor.FileDescriptorProto) *string {
+func filename(in *descriptor.FileDescriptorProto) *string {
 	if in.Name != nil {
 		name := *in.Name
 		ext := filepath.Ext(name)
@@ -112,6 +112,15 @@ func other(fields []*descriptor.FieldDescriptorProto) interface{} {
 	return results
 }
 
+func name(field *descriptor.FieldDescriptorProto) string {
+	name := gogoproto.GetCustomName(field)
+	if name != "" {
+		return name
+	}
+
+	return camel(*field.Name)
+}
+
 func id(typeName string, messages []*descriptor.DescriptorProto) string {
 	name := base(typeName)
 	for _, message := range messages {
@@ -143,6 +152,7 @@ func newTemplate(content string) (*template.Template, error) {
 		"type":  typ,
 		"other": other,
 		"id":    id,
+		"name":  name,
 	}
 
 	return template.New("page").Funcs(fn).Parse(content)

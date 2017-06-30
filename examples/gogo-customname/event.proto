@@ -15,6 +15,7 @@ message b {
     int32 version = 2;
     int64 at = 3;
     string name = 4;
+    string external_id = 5 [(gogoproto.customname) = "ExternalID"];
 }
 
 message event_container {
