@@ -127,13 +127,16 @@ func id(typeName string, messages []*descriptor.DescriptorProto) string {
 		if name == *message.Name {
 			for _, field := range message.Field {
 				fieldName := *field.Name
-				if fieldName != "id" {
+				if strings.ToLower(fieldName) != "id" {
 					continue
 				}
 
 				name := gogoproto.GetCustomName(field)
 				if name != "" {
 					return name
+				}
+				if fieldName == "ID" {
+					return fieldName
 				}
 
 				return "Id"

@@ -10,7 +10,7 @@ import (
 
 func TestEncoderDecoder(t *testing.T) {
 	e1 := eventsource.Event(&A{Id: "abc"})
-	e2 := eventsource.Event(&B{Id: "def"})
+	e2 := eventsource.Event(&B{ID: "def"})
 
 	buf := bytes.NewBuffer(nil)
 	encoder := NewEncoder(buf)

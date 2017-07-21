@@ -9,10 +9,10 @@ message a {
 }
 
 message b {
-    string id = 1;
-    int32 version = 2;
-    int64 at = 3;
-    string name = 4;
+    string ID = 1;
+    int32 Version = 2;
+    int64 At = 3;
+    string Name = 4;
 }
 
 message event_container {

@@ -42,7 +42,7 @@ func (m *A) AggregateID() string { return m.Id }
 func (m *A) EventVersion() int   { return int(m.Version) }
 func (m *A) EventAt() time.Time  { return time.Unix(m.At, 0) }
 
-func (m *B) AggregateID() string { return m.Id }
+func (m *B) AggregateID() string { return m.ID }
 func (m *B) EventVersion() int   { return int(m.Version) }
 func (m *B) EventAt() time.Time  { return time.Unix(m.At, 0) }
 
@@ -204,7 +204,7 @@ func (b *Builder) A() {
 
 func (b *Builder) B(name string, ) {
 	event := &B{
-		Id:      b.id,
+		ID:      b.id,
 		Version: b.nextVersion(),
 		At:      time.Now().Unix(),
 	Name: name,
