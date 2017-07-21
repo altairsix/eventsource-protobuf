@@ -12,6 +12,6 @@ func (c *RegisterUser) AggregateID() string {
 
 // AggregateID implements the eventsource.Command interface for ResetPassword
 func (c *ResetPassword) AggregateID() string {
-	return c.Id
+	return c.ID
 }
 

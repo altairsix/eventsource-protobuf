@@ -3,6 +3,8 @@ package generate
 import (
 	"bytes"
 
+	"strings"
+
 	"github.com/gogo/protobuf/protoc-gen-gogo/descriptor"
 	"github.com/gogo/protobuf/protoc-gen-gogo/plugin"
 	"github.com/pkg/errors"
@@ -25,7 +27,7 @@ func (c *{{ .Name }}) AggregateID() string {
 
 func isCommand(in *descriptor.DescriptorProto) bool {
 	for _, field := range in.Field {
-		if *field.Name == "id" {
+		if strings.ToLower(*field.Name) == "id" {
 			return true
 		}
 	}

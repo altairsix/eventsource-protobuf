@@ -124,13 +124,16 @@ func name(field *descriptor.FieldDescriptorProto) string {
 func id(in *descriptor.DescriptorProto) string {
 	for _, field := range in.Field {
 		fieldName := *field.Name
-		if fieldName != "id" {
+		if strings.ToLower(fieldName) != "id" {
 			continue
 		}
 
 		name := gogoproto.GetCustomName(field)
 		if name != "" {
 			return name
+		}
+		if fieldName == "ID" {
+			return fieldName
 		}
 
 		return "Id"

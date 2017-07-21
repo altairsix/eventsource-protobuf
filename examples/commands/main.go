@@ -15,6 +15,6 @@ func main() {
 	cmd = &RegisterUser{ID: "abc"}
 	fmt.Printf("%#v\n", cmd)
 
-	cmd = &ResetPassword{Id: "def"}
+	cmd = &ResetPassword{ID: "def"}
 	fmt.Printf("%#v\n", cmd)
 }

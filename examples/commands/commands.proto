@@ -9,5 +9,5 @@ message RegisterUser {
 }
 
 message ResetPassword {
-    string id = 1;
+    string ID = 1;
 }
