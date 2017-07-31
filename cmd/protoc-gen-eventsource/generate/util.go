@@ -169,7 +169,7 @@ outer:
 			if index > 0 {
 				return nil, errors.New("not found")
 			}
-			if *field.Name != "type" || *field.Number != int32(1) {
+			if strings.ToLower(*field.Name) != "type" || *field.Number != int32(1) {
 				continue outer
 			}
 			return message, nil
