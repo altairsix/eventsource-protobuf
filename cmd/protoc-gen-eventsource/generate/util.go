@@ -66,13 +66,14 @@ func camel(in string) string {
 		}
 		capped = append(capped, strings.ToUpper(segment[0:1])+segment[1:])
 	}
+
 	return strings.Join(capped, "")
 }
 
 func typ(in interface{}) interface{} {
 	switch v := in.(type) {
-	case *descriptor.FieldDescriptorProto_Type:
-		switch *v {
+	case *descriptor.FieldDescriptorProto:
+		switch v.GetType() {
 		case descriptor.FieldDescriptorProto_TYPE_BOOL:
 			return "bool"
 		case descriptor.FieldDescriptorProto_TYPE_BYTES:
@@ -89,12 +90,12 @@ func typ(in interface{}) interface{} {
 			return "uint32"
 		case descriptor.FieldDescriptorProto_TYPE_UINT64:
 			return "uint64"
-		default:
-			return nil
+		case descriptor.FieldDescriptorProto_TYPE_ENUM:
+			return v.GetName()
 		}
-	default:
-		return nil
 	}
+
+	return nil
 }
 
 func other(fields []*descriptor.FieldDescriptorProto) interface{} {

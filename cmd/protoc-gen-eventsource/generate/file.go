@@ -192,7 +192,7 @@ func (b *Builder) nextVersion() int32 {
 }
 
 {{ range .Events }}
-func (b *Builder) {{ .Name | camel }}({{ range .Field | other }}{{ .Name | camel | lower }} {{ .Type | type }}, {{ end }}) {
+func (b *Builder) {{ .Name | camel }}({{ range .Field | other }}{{ .Name | camel | lower }} {{ . | type }}, {{ end }}) {
 	event := &{{ .Name | camel }}{
 		{{ id .Name $Events }}:      b.id,
 		Version: b.nextVersion(),
