@@ -98,7 +98,8 @@ func typ(in interface{}) (t string) {
 		case descriptor.FieldDescriptorProto_TYPE_UINT64:
 			return "uint64"
 		case descriptor.FieldDescriptorProto_TYPE_ENUM:
-			return v.GetName()
+			segments := strings.Split(v.GetTypeName(), ".") // TypeName will be in the form `.{pkg}.{type}`
+			return segments[len(segments)-1]
 		}
 	}
 
