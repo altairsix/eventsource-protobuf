@@ -70,9 +70,16 @@ func camel(in string) string {
 	return strings.Join(capped, "")
 }
 
-func typ(in interface{}) interface{} {
+func typ(in interface{}) (t string) {
 	switch v := in.(type) {
 	case *descriptor.FieldDescriptorProto:
+		repeated := v.Label != nil && *v.Label == descriptor.FieldDescriptorProto_LABEL_REPEATED
+		defer func() {
+			if repeated {
+				t = "[]" + t
+			}
+		}()
+
 		switch v.GetType() {
 		case descriptor.FieldDescriptorProto_TYPE_BOOL:
 			return "bool"
@@ -95,7 +102,7 @@ func typ(in interface{}) interface{} {
 		}
 	}
 
-	return nil
+	return ""
 }
 
 func other(fields []*descriptor.FieldDescriptorProto) interface{} {
