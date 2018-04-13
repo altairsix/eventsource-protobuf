@@ -100,6 +100,9 @@ func typ(in interface{}) (t string) {
 		case descriptor.FieldDescriptorProto_TYPE_ENUM:
 			segments := strings.Split(v.GetTypeName(), ".") // TypeName will be in the form `.{pkg}.{type}`
 			return segments[len(segments)-1]
+		case descriptor.FieldDescriptorProto_TYPE_MESSAGE:
+			segments := strings.Split(v.GetTypeName(), ".") // TypeName will be in the form `.{pkg}.{type}`
+			return segments[len(segments)-1]
 		}
 	}
 

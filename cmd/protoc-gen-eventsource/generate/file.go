@@ -3,6 +3,8 @@ package generate
 import (
 	"bytes"
 
+	"strings"
+
 	"github.com/gogo/protobuf/protoc-gen-gogo/descriptor"
 	"github.com/gogo/protobuf/protoc-gen-gogo/plugin"
 	"github.com/pkg/errors"
@@ -206,6 +208,30 @@ func (b *Builder) {{ .Name | camel }}({{ range .Field | other }}{{ .Name | camel
 `
 )
 
+func isEventType(proto *descriptor.DescriptorProto) bool {
+	var (
+		hasID      bool
+		hasAt      bool
+		hasVersion bool
+	)
+
+	for _, field := range proto.Field {
+		if field.Name == nil {
+			continue
+		}
+		switch strings.ToLower(*field.Name) {
+		case "id":
+			hasID = true
+		case "at":
+			hasAt = true
+		case "version":
+			hasVersion = true
+		}
+	}
+
+	return hasID && hasAt && hasVersion
+}
+
 // File accepts the proto file definition and returns the response for this file
 func File(in *descriptor.FileDescriptorProto) (*plugin_go.CodeGeneratorResponse_File, error) {
 	pkg, err := packageName(in)
@@ -224,6 +250,9 @@ func File(in *descriptor.FileDescriptorProto) (*plugin_go.CodeGeneratorResponse_
 	events := make([]*descriptor.DescriptorProto, 0, len(in.MessageType))
 	for _, m := range in.MessageType {
 		if m == message {
+			continue
+		}
+		if !isEventType(m) {
 			continue
 		}
 		events = append(events, m)
